@@ -124,8 +124,8 @@ services:
   #   command: "npm start"
   #   restart: always
   swoole:
-    # build: ./swoole/
-    image: cozzz/swoole
+    build: ./swoole/add_sqlsrv/
+    # image: cozzz/swoole
     links:
       - mysql-db:mysql-db
       - redis-db:redis-db
@@ -135,8 +135,8 @@ services:
       - "9500:9500"
     volumes:
       - ./www/:/app/:rw
-      - ./conf/swoole/:/usr/local/etc/php/:rw
-      - ./log/swoole/:/data/wwwlogs/:rw
+      - ./conf/swoole/add_sqlsrv/:/usr/local/etc/php/:rw
+      - ./log/swoole/add_sqlsrv/:/data/wwwlogs/:rw
     networks: 
       - dev-net
     restart: always
