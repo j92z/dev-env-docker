@@ -67,8 +67,6 @@ ENV PHP_VERSION 7.2.13
 ENV PHP_URL="https://secure.php.net/get/php-7.2.13.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.2.13.tar.xz.asc/from/this/mirror"
 ENV PHP_SHA256="14b0429abdb46b65c843e5882c9a8c46b31dfbf279c747293b8ab950c2644a4b" PHP_MD5=""
 
-RUN 
-
 RUN set -xe; \
 	runInstallDeps=' \
 			wget \
