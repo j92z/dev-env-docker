@@ -124,7 +124,7 @@ services:
   #   command: "npm start"
   #   restart: always
   swoole:
-    build: ./swoole/add_sqlsrv/
+    build: ./swoole/debian_add_sqlsrv/
     # image: cozzz/swoole
     links:
       - mysql-db:mysql-db
