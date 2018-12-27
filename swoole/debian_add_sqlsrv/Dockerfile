@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y \
 		xz-utils \
 # install pdo_sqlsrv 需要补充unixodbc
 		unixodbc \
+		unixodbc-dev \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
 
 ENV PHP_INI_DIR /usr/local/etc/php
@@ -66,22 +67,6 @@ ENV GPG_SERVERS ha.pool.sks-keyservers.net hkp://p80.pool.sks-keyservers.net:80 
 ENV PHP_VERSION 7.2.13
 ENV PHP_URL="https://secure.php.net/get/php-7.2.13.tar.xz/from/this/mirror" PHP_ASC_URL="https://secure.php.net/get/php-7.2.13.tar.xz.asc/from/this/mirror"
 ENV PHP_SHA256="14b0429abdb46b65c843e5882c9a8c46b31dfbf279c747293b8ab950c2644a4b" PHP_MD5=""
-
-RUN set -xe; \
-	runInstallDeps=' \
-			wget \
-			gnupg \
-		'; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $runInstallDeps; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -; \
-	TEMP_DEB="$(mktemp)"; \
-	wget -O "$TEMP_DEB" 'https://packages.microsoft.com/debian/9/prod/pool/main/m/msodbcsql17/msodbcsql17_17.2.0.1-1_amd64.deb'; \
-	yes | dpkg --skip-same-version -i "$TEMP_DEB"; \
-	rm -f "$TEMP_DEB"; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $runInstallDeps
 
 RUN set -xe; \
 	\
@@ -126,6 +111,11 @@ RUN set -xe; \
 		rm -rf "$GNUPGHOME"; \
 	fi; \
 	\
+	curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -; \
+	TEMP_DEB="$(mktemp)"; \
+	wget -O "$TEMP_DEB" 'https://packages.microsoft.com/debian/9/prod/pool/main/m/msodbcsql17/msodbcsql17_17.2.0.1-1_amd64.deb'; \
+	yes | dpkg --skip-same-version -i "$TEMP_DEB"; \
+	rm -f "$TEMP_DEB"; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
 
 COPY docker-php-source /usr/local/bin/
@@ -218,6 +208,7 @@ RUN set -eux; \
 		--enable-opcache \
 		--enable-pcntl \
 		--enable-sockets \
+		--enable-zip \
 		\
 # bundled pcre does not support JIT on s390x
 # https://manpages.debian.org/stretch/libpcre3-dev/pcrejit.3.en.html#AVAILABILITY_OF_JIT_SUPPORT
@@ -271,9 +262,6 @@ RUN set -eux; \
 		| sort -u \
 		| xargs -r apt-mark manual \
 	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	\
-	php --version; \
 	\
 # https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
