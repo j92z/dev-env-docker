@@ -1,0 +1,161 @@
+version: '3.2'
+services:
+  php-fpm:
+    # build: ./php/
+    image: cozzz/phpfpm
+    ports:
+      - "9000:9000"
+      - "9100:9100"
+    links:
+      - mysql-db:mysql-db
+      - redis-db:redis-db
+    volumes:
+      - ./www/:/data/www/:rw
+      - ./conf/php/71/:/usr/local/etc/php/:rw
+      - ./conf/php-fpm/71/php-fpm.conf:/usr/local/etc/php-fpm.conf:rw
+      - ./conf/php-fpm/71/conf.d/:/usr/local/etc/php-fpm.d/:rw
+      - ./log/php-fpm/71/:/var/log/php-fpm/:rw
+    networks: 
+      - dev-net
+    restart: always
+    command: php-fpm
+
+  # php-fpm53:
+  #   # build: ./php/
+  #   image: cozzz/phpfpm:5.3.29
+  #   ports:
+  #     - "9200:9000"
+  #   links:
+  #     - mysql-db:mysql-db
+  #     - redis-db:redis-db
+  #   volumes:
+  #     - ./www/:/data/www/:rw
+  #     - ./conf/php/53/:/usr/local/etc/php/:rw
+  #     - ./conf/php-fpm/53/php-fpm.conf:/usr/local/etc/php-fpm.conf:rw
+  #     - ./conf/php-fpm/53/conf.d/:/usr/local/etc/php-fpm.d/:rw
+  #     - ./log/php-fpm/53/:/var/log/php-fpm/:rw
+  #   networks: 
+  #     - dev-net
+  #   restart: always
+  #   # tty: true
+  #   command: php-fpm
+
+  # php-fpm56:
+  #   # build: ./php/56/
+  #   image: cozzz/phpfpm:5.6.39
+  #   ports:
+  #     - "9300:9000"
+  #   links:
+  #     - mysql-db:mysql-db
+  #     - redis-db:redis-db
+  #   volumes:
+  #     - ./www/:/data/www/:rw
+  #     - ./conf/php/56/:/usr/local/etc/php/:rw
+  #     - ./conf/php-fpm/56/php-fpm.conf:/usr/local/etc/php-fpm.conf:rw
+  #     - ./conf/php-fpm/56/conf.d/:/usr/local/etc/php-fpm.d/:rw
+  #     - ./log/php-fpm/56/:/var/log/php-fpm/:rw
+  #   networks: 
+  #     - dev-net
+  #   restart: always
+  #   # tty: true
+  #   command: php-fpm
+
+  nginx:
+    # build: ./nginx/
+    image: cozzz/nginx
+    depends_on:
+      - php-fpm
+      # - python3-uwsgi
+      # - php-fpm53
+      # - php-fpm56
+    links:
+      - php-fpm:php-fpm
+      # - php-fpm53:php-fpm53
+      # - php-fpm56:php-fpm56
+      # - python3-uwsgi:python3-uwsgi
+    volumes:
+      - ./www/:/data/www/:rw
+      - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf:rw
+      - ./conf/nginx/conf.d/:/etc/nginx/conf.d/:rw
+      - ./log/nginx/:/var/log/nginx/:rw
+    networks: 
+      - dev-net
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "8090:8090"
+      - "8070:8070"
+    restart: always
+    command: nginx -g 'daemon off;'
+
+  mysql-db:
+    # build: ./mysql/
+    image: cozzz/mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql/:/var/lib/mysql/:rw
+      - ./log/mysql/:/var/lib/mysql-logs/:rw
+      - ./mysql/conf.d/:/etc/mysql/conf.d/:rw
+    env_file: ./mysql/init.env
+    networks: 
+      - dev-net
+    restart: always
+    command: "--character-set-server=utf8"
+
+  redis-db:
+    # build: ./redis/
+    image: cozzz/redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis/:/data/
+    networks: 
+      - dev-net
+    restart: always
+
+  # nodejs:
+  #   build: ./nodejs/
+  #   volumes:
+  #     - ./www/blog/:/src/:rw
+  #     - ./modules/nodejs/:/src/node_modules:rw
+  #   ports:
+  #     - "9906:9906"
+  #   command: "npm start"
+  #   restart: always
+  # swoole:
+  #   # build: ./swoole/debian_add_sqlsrv/
+  #   image: cozzz/swoole:7.2-sqlsrv
+  #   links:
+  #     - mysql-db:mysql-db
+  #     - redis-db:redis-db
+  #   ports:
+  #     - "9501:9501"
+  #     - "9502:9502"
+  #     - "9500:9500"
+  #   volumes:
+  #     - ./www/:/app/:rw
+  #     - ./conf/swoole/add_sqlsrv/:/usr/local/etc/php/:rw
+  #     - ./log/swoole/add_sqlsrv/:/data/wwwlogs/:rw
+  #   networks: 
+  #     - dev-net
+  #   restart: always
+  #   stdin_open: true
+  #   tty: true
+    # command: php /app/swoole_server.php
+    # command: tail -f /var/log/cron.log
+  
+  # python3-uwsgi:
+  #     build: ./python/
+  #     ports:
+  #       - "8001:8001"
+  #       - "9191:9191"
+  #     volumes:
+  #       - ./www/reco_py:/usr/src/app/:ro
+  #       - ./www/start_yousi/Public/photo/:/tmp/photo/:rw
+  #     restart: always
+  #     command: uwsgi uwsgi_config.ini
+
+networks:
+  dev-net:
+    driver: bridge

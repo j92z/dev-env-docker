@@ -1,0 +1,12 @@
+version: '3.2'
+services:
+  go:
+    build: ./
+    ports:
+      - '7001:7001'
+    volumes:
+      - '../www:/mnt:rw'
+    restart: always
+    stdin_open: true
+    tty: true
+    working_dir: /mnt
