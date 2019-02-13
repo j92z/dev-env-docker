@@ -11,3 +11,4 @@ deploy-gitlab/logs/*
 deploy-gitlab/config/*
 deploy-gitlab/data/*
 mysql/init.env
+docker-compose.yml
