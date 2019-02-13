@@ -9,7 +9,7 @@ LABEL maintainer coze <zeco11320@gmail.com>
 ENV TZ "Asia/Shanghai"
 
 # Ext versions
-ENV SWOOLE_VER=4.2.6
+ENV SWOOLE_VER=4.2.9
 
 # dependencies required for running "phpize"
 # these get automatically installed and removed by "docker-php-ext-*" (unless they're already installed)
@@ -182,7 +182,7 @@ RUN set -xe \
 	# && rm -rf redis-4.2.0.tgz \
 # 安装swoole扩展
 	# && curl -sS -o /tmp/swoole.tar.gz http://pecl.php.net/get/swoole-$SWOOLE_VER.tgz \
-	&& tar zxvf swoole-4.2.6.tgz && cd swoole-4.2.6 \
+	&& tar zxvf swoole-4.2.9.tgz && cd swoole-4.2.9 \
 	&& phpize \
 	&& ./configure \
         --with-php-config=/usr/local/bin/php-config \
@@ -193,11 +193,13 @@ RUN set -xe \
         --enable-mysqlnd \
 	&& make -j "$(nproc)" && make install \
 	&& pecl install pdo_sqlsrv sqlsrv \
+	&& pecl install seaslog \
 	&& { \
 		echo 'extension=redis.so'; \
 		echo 'extension=swoole.so'; \
 		echo 'extension=pdo_sqlsrv.so'; \
 		echo 'extension=sqlsrv.so'; \
+		echo 'extension=seaslog.so'; \
 	} | tee /usr/local/etc/php/conf.d/ext.ini \
 	&& cd / \
 	&& docker-php-source delete \

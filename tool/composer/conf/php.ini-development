@@ -194,7 +194,7 @@ engine = On
 ; Development Value: Off
 ; Production Value: Off
 ; http://php.net/short-open-tag
-short_open_tag = on
+short_open_tag = Off
 
 ; The number of significant digits displayed in floating point numbers.
 ; http://php.net/precision
@@ -704,8 +704,6 @@ default_charset = "UTF-8"
 ; See also output_buffer.
 ; http://php.net/output-encoding
 ;output_encoding =
-; fix warning about php://input
-always_populate_raw_post_data = -1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Paths and Directories ;
