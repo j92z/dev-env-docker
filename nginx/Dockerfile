@@ -12,6 +12,8 @@ ENV TZ "Asia/Shanghai"
 
 ENV NGINX_VERSION 1.15.5
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& CONFIG="\
 		--prefix=/etc/nginx \
@@ -60,7 +62,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	" \
 	&& addgroup -S nginx \
 	&& adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx \
-	&& apk add --no-cache --virtual .build-deps --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	&& apk add --no-cache --virtual .build-deps  \
 		gcc \
 		libc-dev \
 		make \
@@ -122,7 +124,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	# the rest away. To do this, we need to install `gettext`
 	# then move `envsubst` out of the way so `gettext` can
 	# be deleted completely, then move `envsubst` back.
-	&& apk add --no-cache --virtual .gettext gettext --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	&& apk add --no-cache --virtual .gettext gettext  \
 	&& mv /usr/bin/envsubst /tmp/ \
 	\
 	&& runDeps="$( \
@@ -131,14 +133,14 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)" \
-	&& apk add --no-cache --virtual .nginx-rundeps $runDeps --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	&& apk add --no-cache --virtual .nginx-rundeps $runDeps  \
 	&& apk del .build-deps \
 	&& apk del .gettext \
 	&& mv /tmp/envsubst /usr/local/bin/ \
 	\
 	# Bring in tzdata so users could set the timezones through the environment
 	# variables
-	&& apk add --no-cache tzdata --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	&& apk add --no-cache tzdata  \
 	\
 	# forward request and error logs to docker log collector
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \

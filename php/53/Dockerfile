@@ -20,8 +20,10 @@ ENV PHPIZE_DEPS \
 		pkgconf \
 		re2c
 
+RUN RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # persistent / runtime deps
-RUN apk add --no-cache --virtual .persistent-deps  --repository http://mirrors.aliyun.com/alpine/v3.4/main/  \
+RUN apk add --no-cache --virtual .persistent-deps    \
 		ca-certificates \
 		curl \
 		tar \
@@ -60,7 +62,7 @@ ENV PHP_SHA256="8438c2f14ab8f3d6cd2495aa37de7b559e33b610f9ab264f0c61b531bf0c262d
 
 RUN set -xe; \
 	\
-	apk add --no-cache --virtual .fetch-deps --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	apk add --no-cache --virtual .fetch-deps  \
 		gnupg \
 		wget \
 	; \
@@ -93,7 +95,7 @@ RUN set -xe; \
 COPY docker-php-source /usr/local/bin/
 COPY file/*.tgz /tmp/
 RUN set -xe \
-	&& apk add --no-cache --virtual .build-deps --repository http://mirrors.aliyun.com/alpine/v3.4/main/ \
+	&& apk add --no-cache --virtual .build-deps  \
 		$PHPIZE_DEPS \
 		coreutils \
 		curl-dev \
